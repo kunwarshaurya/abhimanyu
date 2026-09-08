@@ -38,7 +38,6 @@ const samplePayload = {
 
   detection: {
     crackDetected: false,
-    jointDetected: false,
   },
 
   health: {

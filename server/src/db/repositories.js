@@ -59,14 +59,13 @@ async function insertVibrationReading(conveyorId, recordedAt, data) {
 async function insertDetection(conveyorId, recordedAt, data) {
   const sql = `
     INSERT INTO detections
-      (conveyor_id, recorded_at, crack_detected, joint_detected)
-    VALUES (?, ?, ?, ?)
+      (conveyor_id, recorded_at, crack_detected)
+    VALUES (?, ?, ?)
   `;
   const params = [
     conveyorId,
     recordedAt,
     data.crackDetected ? 1 : 0,
-    data.jointDetected ? 1 : 0,
   ];
   const [result] = await pool.execute(sql, params);
   return result;

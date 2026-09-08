@@ -1,9 +1,10 @@
 import React from 'react';
 
 const severityColor = {
-  Low: '#10b981',
-  Medium: '#f59e0b',
-  High: '#ef4444',
+  Low: '#10B981',
+  Medium: '#F59E0B',
+  High: '#EF4444',
+  Critical: '#EF4444',
 };
 
 export default function AlertHistory({ data }) {
@@ -11,7 +12,7 @@ export default function AlertHistory({ data }) {
 
   return (
     <div className="card history-table-card">
-      <h3>Alert History</h3>
+      <h3>ALERT HISTORY</h3>
       {isEmpty ? (
         <div className="chart-empty">No alerts for this time range</div>
       ) : (
@@ -37,8 +38,8 @@ export default function AlertHistory({ data }) {
                     <span
                       className="severity-badge"
                       style={{
-                        background: severityColor[row.damage_severity] || '#6b7280',
-                        color: '#fff',
+                        background: severityColor[row.damage_severity] || '#64748B',
+                        color: '#FFFFFF',
                       }}
                     >
                       {row.damage_severity || '—'}

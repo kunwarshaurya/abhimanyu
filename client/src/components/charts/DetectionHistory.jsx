@@ -5,7 +5,7 @@ export default function DetectionHistory({ data }) {
 
   return (
     <div className="card history-table-card">
-      <h3>Detection History</h3>
+      <h3>CRACK DETECTION HISTORY</h3>
       {isEmpty ? (
         <div className="chart-empty">No detections for this time range</div>
       ) : (
@@ -14,8 +14,7 @@ export default function DetectionHistory({ data }) {
             <thead>
               <tr>
                 <th>Time</th>
-                <th>Crack</th>
-                <th>Joint</th>
+                <th>Crack Status</th>
               </tr>
             </thead>
             <tbody>
@@ -28,13 +27,14 @@ export default function DetectionHistory({ data }) {
                     })}
                   </td>
                   <td>
-                    <span className={`det-badge ${row.crack_detected ? 'det-yes' : 'det-no'}`}>
-                      {row.crack_detected ? '⚠ YES' : '✓ No'}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`det-badge ${row.joint_detected ? 'det-yes' : 'det-no'}`}>
-                      {row.joint_detected ? '⚠ YES' : '✓ No'}
+                    <span 
+                      className="det-badge"
+                      style={{
+                        background: row.crack_detected ? '#EF4444' : '#10B981',
+                        color: '#FFFFFF'
+                      }}
+                    >
+                      {row.crack_detected ? 'Crack Detected' : 'Crack Clear'}
                     </span>
                   </td>
                 </tr>

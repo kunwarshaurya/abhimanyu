@@ -48,14 +48,13 @@ CREATE TABLE IF NOT EXISTS vibration_readings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------------------------------------
--- Detection results (crack / joint detection from AI/ML)
+-- Detection results (crack detection from AI/ML)
 -- ----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS detections (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   conveyor_id     VARCHAR(32)   NOT NULL DEFAULT 'CONV-01',
   recorded_at     DATETIME(3)   NOT NULL,
   crack_detected  TINYINT(1)    NOT NULL DEFAULT 0,
-  joint_detected  TINYINT(1)    NOT NULL DEFAULT 0,
   created_at      DATETIME(3)   NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
   INDEX idx_detection_conveyor_time (conveyor_id, recorded_at),

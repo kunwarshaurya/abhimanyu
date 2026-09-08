@@ -65,9 +65,6 @@ function validatePayload(body) {
     if (typeof body.detection.crackDetected !== 'boolean') {
       errors.push('detection.crackDetected must be a boolean');
     }
-    if (typeof body.detection.jointDetected !== 'boolean') {
-      errors.push('detection.jointDetected must be a boolean');
-    }
   }
 
   // --- health ---

@@ -55,8 +55,8 @@ app.set('setConveyorState', (state) => { latestConveyorState = state; });
 // --- Start server ---
 const PORT = parseInt(process.env.PORT, 10) || 4000;
 
-server.listen(PORT, async () => {
-  console.log(`[Server] Listening on http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', async () => {
+  console.log(`[Server] Listening on 0.0.0.0:${PORT}`);
   console.log(`[Server] CORS origin: ${CLIENT_URL}`);
 
   // Test database connection (non-blocking)

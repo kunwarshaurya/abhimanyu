@@ -52,7 +52,7 @@ async function getHealthHistory(from, to, conveyorId = 'CONV-01') {
 // ── Detections ──
 async function getDetectionHistory(from, to, conveyorId = 'CONV-01') {
   const sql = `
-    SELECT recorded_at, crack_detected, joint_detected
+    SELECT recorded_at, crack_detected
     FROM detections
     WHERE conveyor_id = ? AND recorded_at >= ? AND recorded_at <= ?
     ORDER BY recorded_at ASC

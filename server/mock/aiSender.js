@@ -4,7 +4,9 @@
  * Simulates the AI/ML system by sending one JSON payload per second
  * to POST /api/v1/conveyor-data.
  *
- * Usage:  node mock/aiSender.js
+ * Usage:
+ *   node mock/aiSender.js              — random scenario mode (default)
+ *   node mock/aiSender.js --demo       — deterministic demo sequence
  *
  * This file is DEVELOPMENT ONLY and must not be imported by production code.
  */
@@ -12,6 +14,8 @@
 const API_URL = process.env.API_URL || 'http://localhost:4000';
 const ENDPOINT = `${API_URL}/api/v1/conveyor-data`;
 const INTERVAL_MS = 1000;
+
+const DEMO_MODE = process.argv.includes('--demo');
 
 // ── Helpers ─────────────────────────────────────────────────
 
@@ -28,6 +32,40 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// ── Demo Scenario Sequence ──────────────────────────────────
+//
+// A fixed, predictable sequence for demonstrations.
+// Each entry defines the scenario for a range of ticks.
+//
+// HEALTHY → WARNING → CRITICAL+CRACK → RECOVERY → HEALTHY
+//
+const DEMO_SEQUENCE = [
+  // Ticks 1–15:  Healthy baseline
+  { until: 15, scenario: 'normal',   crack: false },
+  // Ticks 16–25: Warning
+  { until: 25, scenario: 'warning',  crack: false },
+  // Ticks 26–40: Critical
+  { until: 35, scenario: 'critical', crack: false },
+  // Ticks 36–45: Critical + Crack Detected
+  { until: 45, scenario: 'critical', crack: true  },
+  // Ticks 46–55: Recovery — Warning, crack clears
+  { until: 55, scenario: 'warning',  crack: false },
+  // Ticks 56+:  Healthy again (loops back to tick 1 at tick 71)
+  { until: 70, scenario: 'normal',   crack: false },
+];
+
+const DEMO_CYCLE_LENGTH = 70;
+
+function getDemoScenario(tick) {
+  const cycleTick = ((tick - 1) % DEMO_CYCLE_LENGTH) + 1;
+  for (const entry of DEMO_SEQUENCE) {
+    if (cycleTick <= entry.until) {
+      return { scenario: entry.scenario, forceCrack: entry.crack };
+    }
+  }
+  return { scenario: 'normal', forceCrack: false };
+}
+
 // ── Payload Generator ───────────────────────────────────────
 
 function generatePayload() {
@@ -35,11 +73,21 @@ function generatePayload() {
 
   const now = new Date().toISOString();
 
-  // Decide scenario: ~80% normal, ~12% warning, ~8% critical
-  const roll = Math.random();
-  let scenario = 'normal';
-  if (roll > 0.92) scenario = 'critical';
-  else if (roll > 0.80) scenario = 'warning';
+  // Decide scenario
+  let scenario, forceCrack;
+
+  if (DEMO_MODE) {
+    const demo = getDemoScenario(tickCount);
+    scenario = demo.scenario;
+    forceCrack = demo.forceCrack;
+  } else {
+    // Random mode: ~80% normal, ~12% warning, ~8% critical
+    const roll = Math.random();
+    if (roll > 0.92) scenario = 'critical';
+    else if (roll > 0.80) scenario = 'warning';
+    else scenario = 'normal';
+    forceCrack = undefined; // decided below
+  }
 
   // --- Sensor data ---
   let temperature, motorSpeed, voltage, current, power;
@@ -84,9 +132,13 @@ function generatePayload() {
   };
 
   // --- Detection ---
-  const crackDetected = scenario === 'critical' && Math.random() > 0.4;
-  const jointDetected = Math.random() > 0.85;
-  const detection = { crackDetected, jointDetected };
+  let crackDetected;
+  if (forceCrack !== undefined) {
+    crackDetected = forceCrack;
+  } else {
+    crackDetected = scenario === 'critical' && Math.random() > 0.4;
+  }
+  const detection = { crackDetected };
 
   // --- Health ---
   let score, confidence, status;
@@ -107,14 +159,7 @@ function generatePayload() {
 
   // --- Alerts ---
   const alerts = [];
-  if (scenario === 'normal') {
-    alerts.push({
-      id: alertIdCounter++,
-      time: now,
-      message: 'No active alerts',
-      damageSeverity: 'Low',
-    });
-  } else if (scenario === 'warning') {
+  if (scenario === 'warning') {
     alerts.push({
       id: alertIdCounter++,
       time: now,
@@ -125,7 +170,7 @@ function generatePayload() {
       ]),
       damageSeverity: 'Medium',
     });
-  } else {
+  } else if (scenario === 'critical') {
     alerts.push({
       id: alertIdCounter++,
       time: now,
@@ -145,6 +190,7 @@ function generatePayload() {
       });
     }
   }
+  // NOTE: In 'normal' scenario, alerts array is empty (no fake "no active alerts" entry)
 
   return {
     timestamp: now,
@@ -160,7 +206,7 @@ function generatePayload() {
 
 async function sendPayload() {
   const payload = generatePayload();
-  const label = `[Tick ${tickCount}] ${payload.health.status}`;
+  const label = `[Tick ${tickCount}] ${payload.health.status}${payload.detection.crackDetected ? ' +CRACK' : ''}`;
 
   try {
     const res = await fetch(ENDPOINT, {
@@ -182,7 +228,12 @@ async function sendPayload() {
 }
 
 // Start
+const modeLabel = DEMO_MODE ? 'DEMO SEQUENCE' : 'RANDOM';
+console.log(`[MockAI] Mode: ${modeLabel}`);
 console.log(`[MockAI] Sending to ${ENDPOINT} every ${INTERVAL_MS}ms`);
+if (DEMO_MODE) {
+  console.log('[MockAI] Sequence: HEALTHY(15s) → WARNING(10s) → CRITICAL(10s) → CRACK(10s) → RECOVERY(10s) → HEALTHY(15s) → repeat');
+}
 console.log('[MockAI] Press Ctrl+C to stop\n');
 
 // Send first payload immediately, then every INTERVAL_MS
