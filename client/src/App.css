@@ -1,8 +1,3 @@
-/* ============================================================
-   Abhimanyu Dashboard — Industrial Monitoring Theme
-   ============================================================ */
-
-/* --- Layout --- */
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;
@@ -399,6 +394,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .tab-btn:hover {
@@ -1200,6 +1198,9 @@
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .fault-more-btn:hover {
@@ -1219,6 +1220,9 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .fault-mute-btn:hover {
@@ -1260,6 +1264,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
 }
 
 .start-conveyor-btn:hover:not(.disabled) {
@@ -1506,3 +1513,518 @@
 }
 
 
+
+/* ============================================================
+   Alert Detail Modal
+   ============================================================ */
+
+.notification-item.clickable:hover {
+  background: #EFF6FF;
+  border-left-width: 6px;
+}
+
+.notification-item.high.clickable:hover {
+  background: #FEE2E2;
+}
+
+.alert-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: alert-overlay-in 200ms ease-out both;
+  padding: 1rem;
+}
+
+@keyframes alert-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.alert-detail-modal {
+  background: #ffffff;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: alert-modal-in 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.alert-detail-modal::-webkit-scrollbar {
+  width: 4px;
+}
+.alert-detail-modal::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 2px;
+}
+
+@keyframes alert-modal-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.alert-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: #F8FAFC;
+  gap: 0.75rem;
+}
+
+.alert-detail-severity {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.alert-detail-msg {
+  margin: 0.2rem 0 0.3rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.alert-detail-time {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.alert-detail-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  line-height: 0;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-detail-close:hover {
+  color: #ef4444;
+  background: #FEF2F2;
+}
+
+.alert-detail-body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.alert-detail-section-title {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+
+.alert-detail-grid {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.alert-detail-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.alert-detail-grid.cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 480px) {
+  .alert-detail-grid.cols-3,
+  .alert-detail-grid.cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.alert-detail-item {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 4px;
+  padding: 0.45rem 0.6rem;
+}
+
+.alert-detail-label {
+  display: block;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+
+.alert-detail-value {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.alert-detail-unit {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.alert-detail-no-snapshot {
+  padding: 1.5rem 1.25rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* ============================================================
+   Alert Detail Modal — Charts & Analytics
+   ============================================================ */
+
+/* ── Section title ── */
+.adm-section-title {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Divider ── */
+.adm-divider {
+  height: 1px;
+  background: #F1F5F9;
+  margin: 0.85rem 0;
+}
+
+/* ── Health Gauge row ── */
+.adm-row-gauge {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.adm-gauge-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 130px;
+}
+
+.adm-gauge-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding-top: 10px;
+}
+
+.adm-gauge-score {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  line-height: 1;
+}
+
+.adm-gauge-sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
+}
+
+.adm-gauge-caption {
+  font-size: 0.58rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.1rem;
+}
+
+/* ── At-a-glance stat grid ── */
+.adm-stat-stack {
+  flex: 1;
+  min-width: 0;
+}
+
+.adm-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.adm-stat-item {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 4px;
+  padding: 0.4rem 0.5rem;
+}
+
+.adm-stat-label {
+  display: block;
+  font-size: 0.58rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.1rem;
+}
+
+.adm-stat-value {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Metric selector pills (Trend chart) ── */
+.adm-metric-pills {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.adm-pill {
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+
+.adm-pill:hover {
+  background: #E2E8F0;
+  color: #0f172a;
+}
+
+.adm-pill.active {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+
+/* ── Chart empty state ── */
+.adm-chart-empty {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  color: #94a3b8;
+  background: #F8FAFC;
+  border-radius: 4px;
+  border: 1px dashed #E2E8F0;
+}
+
+/* ── Recharts tooltip ── */
+.adm-tooltip {
+  background: #1e293b;
+  border: none;
+  border-radius: 5px;
+  padding: 0.4rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.adm-tooltip-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.adm-tooltip-val {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.adm-tooltip-time {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Responsive: stack gauge on small screens ── */
+@media (max-width: 440px) {
+  .adm-row-gauge {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .adm-gauge-wrap {
+    width: 100%;
+  }
+  .adm-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Sensor Number Grid ──────────────────────────────────────── */
+.adm-sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 440px) {
+  .adm-sensor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.adm-sensor-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.adm-sensor-icon {
+  display: flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.adm-sensor-label {
+  font-size: 0.6rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.adm-sensor-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  line-height: 1.2;
+}
+
+.adm-sensor-unit {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+/* ── Vibration explanation text ──────────────────────────────── */
+.adm-vib-explain {
+  font-size: 0.72rem;
+  color: #64748b;
+  line-height: 1.5;
+  background: #F8FAFC;
+  border-left: 3px solid #CBD5E1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Vibration two-group layout ──────────────────────────────── */
+.adm-vib-groups {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 440px) {
+  .adm-vib-groups {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adm-vib-group {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+}
+
+.adm-vib-group-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.adm-vib-group-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.adm-vib-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.adm-vib-axis {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #334155;
+  width: 36px;
+  flex-shrink: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.adm-vib-track {
+  flex: 1;
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.adm-vib-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.adm-vib-num {
+  font-size: 0.68rem;
+  font-weight: 700;
+  width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  flex-shrink: 0;
+}

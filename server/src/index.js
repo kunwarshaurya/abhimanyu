@@ -15,7 +15,15 @@ const server = http.createServer(app);
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
-app.use(cors({ origin: CLIENT_URL }));
+// Allow multiple origins — local + any device on the same subnet
+const ALLOWED_ORIGINS = [
+  CLIENT_URL,
+  'http://localhost:5173',
+  'http://192.168.137.91:5173',
+  'http://192.168.137.142:5173',
+];
+
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 
 // --- Routes ---
@@ -26,7 +34,7 @@ app.use('/api/v1/history', historyRouter);
 // --- Socket.IO setup ---
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: ALLOWED_ORIGINS,
     methods: ['GET', 'POST'],
   },
 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import useSocket from './hooks/useSocket';
 import useAlarm from './hooks/useAlarm';
 import ConveyorVisualization from './components/ConveyorVisualization';
@@ -10,9 +11,11 @@ import DetectionStatus from './components/DetectionStatus';
 import NotificationCenter from './components/NotificationCenter';
 import CriticalBanner from './components/CriticalBanner';
 import HistoryView from './components/HistoryView';
+import { Radio, BarChart2 } from 'lucide-react';
 import './App.css';
 
 const MAX_NOTIFICATIONS = 100;
+const HISTORY_BUFFER_SIZE = 20; // last 20 ticks stored for chart context
 
 export default function App() {
   const { data, connected, lastUpdate } = useSocket();
@@ -34,6 +37,9 @@ export default function App() {
   const [notifications, setNotifications] = useState([]);
   const seenAlertsRef = useRef(new Set());
 
+  // ── Rolling sensor/health history buffer (last N ticks) ──
+  const historyBufferRef = useRef([]);
+
   // ── Track previous health status for transition detection ──
   const prevHealthRef = useRef(null);
 
@@ -53,6 +59,29 @@ export default function App() {
     prevHealthRef.current = currentStatus;
   }, [data?.health?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Maintain rolling history buffer on every incoming tick ──
+  useEffect(() => {
+    if (!data?.sensorData) return;
+    const entry = {
+      time: data.timestamp ? new Date(data.timestamp).toLocaleTimeString() : '',
+      temperature: data.sensorData.temperature,
+      motorSpeed: data.sensorData.motorSpeed,
+      voltage: data.sensorData.voltage,
+      current: data.sensorData.current,
+      power: data.sensorData.power,
+      healthScore: data.health?.score,
+      accX: Math.abs(data.vibration?.accX ?? 0),
+      accY: Math.abs(data.vibration?.accY ?? 0),
+      accZ: data.vibration?.accZ,
+      gyroX: Math.abs(data.vibration?.gyroX ?? 0),
+      gyroY: Math.abs(data.vibration?.gyroY ?? 0),
+      gyroZ: Math.abs(data.vibration?.gyroZ ?? 0),
+    };
+    const buf = historyBufferRef.current;
+    buf.push(entry);
+    if (buf.length > HISTORY_BUFFER_SIZE) buf.shift();
+  }, [data?.timestamp]);
+
   // ── Accumulate deduplicated notifications from incoming alerts ──
   useEffect(() => {
     if (!data?.alerts || !Array.isArray(data.alerts) || data.alerts.length === 0) return;
@@ -62,7 +91,19 @@ export default function App() {
       const key = `${alert.id}-${alert.time}-${alert.message}-${alert.damageSeverity}`;
       if (!seenAlertsRef.current.has(key)) {
         seenAlertsRef.current.add(key);
-        newAlerts.push({ ...alert, _key: key });
+        // Store full snapshot at alert time for detail modal
+        newAlerts.push({
+          ...alert,
+          _key: key,
+          _snapshot: {
+            sensorData: data.sensorData,
+            vibration: data.vibration,
+            health: data.health,
+            detection: data.detection,
+            timestamp: data.timestamp,
+            history: [...historyBufferRef.current], // rolling context for charts
+          },
+        });
       }
     }
 
@@ -120,13 +161,13 @@ export default function App() {
               className={`tab-btn ${tab === 'live' ? 'active' : ''}`}
               onClick={() => setTab('live')}
             >
-              ● Live
+              <Radio size={13} strokeWidth={2} /> Live
             </button>
             <button
               className={`tab-btn ${tab === 'history' ? 'active' : ''}`}
               onClick={() => setTab('history')}
             >
-              📊 History
+              <BarChart2 size={13} strokeWidth={2} /> History
             </button>
           </div>
         </div>
@@ -166,8 +207,8 @@ export default function App() {
         )}
       </div>
 
-      {/* Critical Fault Overlay — viewport-level, above everything including Three.js labels */}
-      {dashboardFrozen && (
+      {/* Critical Fault Overlay — rendered into document.body via portal, above everything including Three.js Html labels */}
+      {dashboardFrozen && createPortal(
         <CriticalBanner
           frozenSnapshot={frozenSnapshot}
           frozenAt={frozenAt}
@@ -176,7 +217,8 @@ export default function App() {
           onStartConveyor={handleStartConveyor}
           alarmMuted={alarmMuted}
           onToggleMute={() => setAlarmMuted(m => !m)}
-        />
+        />,
+        document.body
       )}
     </>
   );
