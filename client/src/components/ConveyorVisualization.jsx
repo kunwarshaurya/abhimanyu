@@ -168,7 +168,7 @@ const Sensor = ({ position, label, value }) => (
       <cylinderGeometry args={[0.04, 0.04, 0.08]} rotation={[Math.PI/2, 0, 0]} />
       <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={0.5} />
     </mesh>
-    <Html center position={[0, 0.3, 0.1]} style={{ pointerEvents: 'none' }}>
+    <Html center position={[0, 0.3, 0.1]} style={{ pointerEvents: 'none' }} zIndexRange={[0, 0]}>
       <div style={{ 
         background: 'rgba(15,27,45,0.85)', border: '1px solid #24364D', borderRadius: '2px',
         padding: '2px 4px', color: '#38BDF8', fontSize: '8px', fontFamily: 'monospace', whiteSpace: 'nowrap'
@@ -196,7 +196,7 @@ const CameraObj = () => (
       <boxGeometry args={[0.1, 0.3, 0.1]} />
       <meshStandardMaterial color="#34465A" />
     </mesh>
-    <Html center position={[0, 0.4, 0]} style={{ pointerEvents: 'none' }}>
+    <Html center position={[0, 0.4, 0]} style={{ pointerEvents: 'none' }} zIndexRange={[0, 0]}>
       <div style={{ color: '#94A3B8', fontSize: '9px', fontFamily: 'monospace' }}>CAM</div>
     </Html>
   </group>
@@ -227,7 +227,7 @@ const Motor = ({ speed, isRunning }) => {
         <cylinderGeometry args={[0.12, 0.12, 0.8]} />
         <meshStandardMaterial color="#94A3B8" metalness={0.8} roughness={0.2} />
       </mesh>
-      <Html center position={[0, 0.8, 0]} style={{ pointerEvents: 'none' }}>
+      <Html center position={[0, 0.8, 0]} style={{ pointerEvents: 'none' }} zIndexRange={[0, 0]}>
         <div style={{ color: '#38BDF8', fontSize: '9px', fontFamily: 'monospace', fontWeight: 'bold' }}>DRIVE</div>
       </Html>
     </group>
@@ -251,7 +251,7 @@ const AirKnife = () => (
       <coneGeometry args={[0.15, 0.5, 8]} />
       <meshBasicMaterial color="#38BDF8" transparent opacity={0.15} depthWrite={false} />
     </mesh>
-    <Html center position={[0.2, 0.3, 0]} style={{ pointerEvents: 'none' }}>
+    <Html center position={[0.2, 0.3, 0]} style={{ pointerEvents: 'none' }} zIndexRange={[0, 0]}>
       <div style={{ color: '#94A3B8', fontSize: '8px', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>AIR KNIFE</div>
     </Html>
   </group>
@@ -275,7 +275,7 @@ const ReflectiveTape = ({ speed, isRunning }) => {
         <boxGeometry args={[0.2, 0.02, 2.85]} />
         <meshBasicMaterial color="#E6EDF5" />
       </mesh>
-      <Html center position={[0, 0.3, 1.4]} style={{ pointerEvents: 'none' }}>
+      <Html center position={[0, 0.3, 1.4]} style={{ pointerEvents: 'none' }} zIndexRange={[0, 0]}>
         <div style={{ color: '#94A3B8', fontSize: '8px', fontFamily: 'monospace' }}>REF</div>
       </Html>
     </group>

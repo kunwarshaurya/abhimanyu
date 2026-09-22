@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Volume2, VolumeX, ChevronDown, ChevronRight, Play } from 'lucide-react';
 
 export default function CriticalBanner({ frozenSnapshot, frozenAt, faultCleared, liveHealthStatus, onStartConveyor, alarmMuted, onToggleMute }) {
   const [expanded, setExpanded] = useState(false);
@@ -68,14 +69,18 @@ export default function CriticalBanner({ frozenSnapshot, frozenAt, faultCleared,
         {/* ── Actions ── */}
         <div className="fault-actions">
           <button className="fault-more-btn" onClick={() => setExpanded(!expanded)}>
-            {expanded ? '▾ Less Info' : '▸ More Info'}
+            {expanded
+              ? <><ChevronDown size={12} strokeWidth={2.5} /> Less Info</>
+              : <><ChevronRight size={12} strokeWidth={2.5} /> More Info</>}
           </button>
           <button
             className={`fault-mute-btn ${alarmMuted ? 'muted' : ''}`}
             onClick={onToggleMute}
             title={alarmMuted ? 'Unmute alarm' : 'Mute alarm'}
           >
-            {alarmMuted ? '🔇 Unmuted' : '🔊 Mute'}
+            {alarmMuted
+              ? <><VolumeX size={13} strokeWidth={2} /> Unmute</>
+              : <><Volume2 size={13} strokeWidth={2} /> Mute</>}
           </button>
           <button
             className={`start-conveyor-btn ${!canStart ? 'disabled' : ''}`}
@@ -83,7 +88,7 @@ export default function CriticalBanner({ frozenSnapshot, frozenAt, faultCleared,
             disabled={!canStart}
             title={!canStart ? 'Cannot start while Critical condition is active' : 'Resume conveyor simulation'}
           >
-            ▶ Start Conveyor
+            <Play size={12} strokeWidth={2.5} fill="currentColor" /> Start Conveyor
           </button>
         </div>
 

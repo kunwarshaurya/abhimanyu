@@ -81,12 +81,11 @@ function generatePayload() {
     scenario = demo.scenario;
     forceCrack = demo.forceCrack;
   } else {
-    // Random mode: ~80% normal, ~12% warning, ~8% critical
+    // Random mode: ~60% normal, ~40% warning, 0% critical
     const roll = Math.random();
-    if (roll > 0.92) scenario = 'critical';
-    else if (roll > 0.80) scenario = 'warning';
+    if (roll > 0.60) scenario = 'warning';
     else scenario = 'normal';
-    forceCrack = undefined; // decided below
+    forceCrack = scenario === 'warning'; // crack detected on every warning tick
   }
 
   // --- Sensor data ---
